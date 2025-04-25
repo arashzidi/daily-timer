@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تایمر ۲۴ ساعته (ریست در 22:22 تهران)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+    
+    /* تم شب تاریک */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #1a1a2e, #16213e);
+      --timer-bg: rgba(0, 0, 0, 0.6);
+      --text-color: #ecf0f1;
+      --progress-color: #e74c3c;
+      --progress-end-color: #c0392b;
+      --circle-bg: rgba(236, 240, 241, 0.1);
+      --shadow-color: rgba(0,0,0,0.4);
+      --theme-btn-bg: rgba(255, 255, 255, 0.15);
+    }
+    
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Vazirmatn', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      transition: all 0.5s ease;
+    }
+    
+    #timer {
+      background: var(--timer-bg);
+      padding: 3rem 4rem;
+      border-radius: 2rem;
+      box-shadow: 0 10px 30px var(--shadow-color);
+      text-align: center;
+      backdrop-filter: blur(15px);
+      transition: all 0.3s ease;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    #timer:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    }
+    
+    #timer h1 {
+      font-size: 4.5rem;
+      margin: 0;
+      letter-spacing: 0.1rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 8px var(--shadow-color);
+    }
+    
+    /* کادر دایره‌ای */
+    .circle {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .circle svg {
+      transform: rotate(0deg);
+      transition: transform 0.3s ease;
+    }
+    
+    .circle circle {
+      fill: none;
+      stroke-width: 15;
+    }
+    
+    .circle .bg {
+      stroke: var(--circle-bg);
+    }
+    
+    .circle .progress {
+      stroke: url(#progress-gradient);
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s linear;
+    }
+    
+    .circle .text {
+      fill: var(--text-color);
+      font-size: 1.8rem;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      font-weight: 700;
+      direction: rtl;
+      unicode-bidi: bidi-override;
+    }
+    
+    /* دکمه تغییر تم */
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--theme-btn-bg);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-color);
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: rotate(30deg);
+    }
+    
+    /* ریسپانسیو */
+    @media (max-width: 768px) {
+      #timer {
+        padding: 2rem;
+        width: 90%;
+      }
+      
+      #timer h1 {
+        font-size: 3.5rem;
+      }
+      
+      .circle {
+        width: 200px;
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="timer">
+    <div class="circle">
+      <svg width="250" height="250">
+        <defs>
+          <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="var(--progress-color)" />
+            <stop offset="100%" stop-color="var(--progress-end-color)" />
+          </linearGradient>
+        </defs>
+        <circle class="bg" cx="125" cy="125" r="110"></circle>
+        <circle class="progress" cx="125" cy="125" r="110" stroke-dasharray="691.2" stroke-dashoffset="0"></circle>
+        <text x="125" y="125" class="text">پایان روز</text>
+      </svg>
+    </div>
+    <h1 id="countdown">00:00:00</h1>
+  </div>
+
+  <script>
+    const targetOffset = 3.5 * 60;
+    const circle = document.querySelector('.circle .progress');
+    const radius = 110;
+    const circumference = 2 * Math.PI * radius;
+    circle.style.strokeDasharray = `${circumference}`;
+
+    function updateTimer() {
+      const now = new Date();
+      const localOffset = now.getTimezoneOffset();
+      const diffOffset = targetOffset + localOffset;
+      const tehranNow = new Date(now.getTime() + diffOffset * 60000);
+
+      const targetLocal = new Date(now.getTime() + diffOffset * 60000);
+      targetLocal.setHours(22,22,0,0);
+      if (tehranNow >= targetLocal) targetLocal.setDate(targetLocal.getDate() + 1);
+
+      const diff = targetLocal - tehranNow;
+      const total = 24*60*60*1000;
+      const offset = circumference - (diff/total) * circumference;
+      circle.style.strokeDashoffset = offset;
+
+      const h = String(Math.floor(diff / (1000*60*60))).padStart(2,'0');
+      const m = String(Math.floor((diff % (1000*60*60))/(1000*60))).padStart(2,'0');
+      const s = String(Math.floor((diff % (1000*60))/1000)).padStart(2,'0');
+
+      document.getElementById('countdown').textContent = `${h}:${m}:${s}`;
+    }
+    updateTimer();
+    setInterval(updateTimer, 1000);
+  </script>
+</body>
+</html>
