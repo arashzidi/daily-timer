@@ -169,7 +169,7 @@
       <div class="progress-bar" id="progress-bar"></div>
     </div>
     
-    <h1 id="countdown">۰۰:۰۰:۰۰</h1>
+    <h1 id="countdown">00:00:00</h1>
   </div>
 
   <script>
@@ -250,8 +250,8 @@
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
       
-      // نمایش با اعداد فارسی
-      const format = num => String(num).padStart(2, '۰');
+      // نمایش با اعداد انگلیسی
+      const format = num => String(num).padStart(2, '0');
       document.getElementById('countdown').textContent = `${format(hours)}:${format(minutes)}:${format(seconds)}`;
       
       // تأکید بصری روی گذر زمان
