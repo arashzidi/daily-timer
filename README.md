@@ -27,7 +27,7 @@
 
 ## 📷 دموی زنده
 
-🔗 [مشاهده نسخه آنلاین در GitHub Pages](https://arashtelr.github.io/daily-timer/)
+🔗 [مشاهده نسخه آنلاین در GitHub Pages](https://arashzidi.github.io/daily-timer/)
 
 ---
 
