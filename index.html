@@ -85,6 +85,7 @@
       border-radius: 10px;
       border-right: 3px solid var(--primary);
       margin-top: 1.5rem;
+      min-height: 120px;
     }
     
     #message {
@@ -100,6 +101,10 @@
       font-style: italic;
       margin-top: 0.5rem;
       font-size: 0.9rem;
+    }
+    
+    .loading {
+      opacity: 0.5;
     }
     
     @keyframes fadeIn {
@@ -121,8 +126,8 @@
     </div>
     
     <div id="message-container">
-      <p id="message">"زمان مانند رودخانه جاری است - در همان آب دو بار قدم نمی‌زنی"</p>
-      <small id="message-source">هراکلیتوس</small>
+      <p id="message">"در حال دریافت جمله..."</p>
+      <small id="message-source"></small>
     </div>
   </div>
 
@@ -134,43 +139,50 @@
     const sourceEl = document.getElementById('message-source');
     const msgContainer = document.getElementById('message-container');
     
-    // پیام‌های انگیزشی با منابع
-    const timeMessages = [
+    // پیام‌های پشتیبان (برای وقتی API در دسترس نیست)
+    const backupQuotes = [
       {
         text: "زمان گرانبهاترین دارایی توست - هرگز آن را بی‌هدف هدر نده",
-        source: "استیو جابز - سخنرانی استنفورد ۲۰۰۵"
+        source: "استیو جابز"
       },
       {
         text: "امروز تنها روزی است که مال توست - دیروز رفته و فردا نیامده",
-        source: "سعدی - گلستان"
+        source: "سعدی"
       },
       {
         text: "یک ساعت امروز بهتر از صد ساعت فرداست",
-        source: "ابوعلی سینا - کتاب قانون"
-      },
-      {
-        text: "موفقیت جمع انتخاب‌های کوچک روزانه است - همین امروز تصمیم بگیر",
-        source: "دارن هاردی - اثر مرکب"
-      },
-      {
-        text: "هر دقیقه‌ای که در برنامه‌ریزی صرف کنی، یک ساعت در اجرا صرفه‌جویی می‌کنی",
-        source: "برایان تریسی - قورباغه را قورت بده"
-      },
-      {
-        text: "امروز اولین روز باقی‌مانده از عمر توست - آن را باشکوه آغاز کن",
-        source: "مارک تواین"
+        source: "ابوعلی سینا"
       }
     ];
     
-    // نمایش پیام تصادفی با افکت
-    function showRandomMessage() {
-      const {text, source} = timeMessages[Math.floor(Math.random() * timeMessages.length)];
+    // دریافت جمله از API
+    async function fetchQuote() {
+      try {
+        msgContainer.classList.add('loading');
+        const response = await fetch('https://api.quotable.io/random?tags=time|motivation');
+        const data = await response.json();
+        
+        return {
+          text: data.content,
+          source: data.author
+        };
+      } catch (error) {
+        console.log('استفاده از جملات پشتیبان به دلیل خطا در API');
+        return backupQuotes[Math.floor(Math.random() * backupQuotes.length)];
+      } finally {
+        msgContainer.classList.remove('loading');
+      }
+    }
+    
+    // نمایش پیام جدید
+    async function showNewMessage() {
+      const quote = await fetchQuote();
       
       msgContainer.classList.remove('new-message');
       void msgContainer.offsetWidth; // Trigger reflow
       
-      messageEl.textContent = `"${text}"`;
-      sourceEl.textContent = `— ${source}`;
+      messageEl.textContent = `"${quote.text}"`;
+      sourceEl.textContent = `— ${quote.source}`;
       
       msgContainer.classList.add('new-message');
     }
@@ -226,13 +238,14 @@
       
       // تغییر پیام هر 5 دقیقه
       if (mins % 5 === 0 && secs === 0) {
-        showRandomMessage();
+        showNewMessage();
       }
     }
     
-    // راه‌اندازی
+    // راه‌اندازی اولیه
     updateTimer();
     setInterval(updateTimer, 1000);
+    showNewMessage(); // نمایش اولین جمله
   </script>
 </body>
 </html>
