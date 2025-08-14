@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تایمر 22:22 | مدیریت زمان</title>
+  <title>تایمر ارزشمندی زمان</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;500;700&display=swap');
     
     :root {
       --primary: #00b894;
       --warning: #ff7675;
-      --bg: #1e272e;
+      --critical: #d63031;
+      --bg: #1a1a1a;
       --text: #f5f6fa;
     }
     
@@ -28,21 +29,25 @@
     #timer {
       text-align: center;
       width: 90%;
-      max-width: 350px;
+      max-width: 300px;
     }
     
     #countdown {
-      font-size: 3.5rem;
+      font-size: 3.2rem;
       font-weight: 300;
-      letter-spacing: 3px;
-      margin: 1rem 0;
+      letter-spacing: 2px;
+      margin: 1.5rem 0;
       color: var(--primary);
       font-variant-numeric: tabular-nums;
     }
     
     .warning {
-      color: var(--warning) !important;
-      animation: pulse 1.5s infinite;
+      color: var(--warning);
+    }
+    
+    .critical {
+      color: var(--critical);
+      animation: pulse 1s infinite;
     }
     
     @keyframes pulse {
@@ -51,64 +56,31 @@
       100% { opacity: 1; }
     }
     
-    .battery {
-      width: 120px;
-      height: 50px;
-      border: 2px solid var(--primary);
-      border-radius: 5px;
-      margin: 1.5rem auto;
-      position: relative;
+    #progress-container {
+      margin: 2rem 0;
+    }
+    
+    #progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
       overflow: hidden;
     }
     
-    .battery::after {
-      content: '';
-      position: absolute;
-      right: -7px;
-      top: 12px;
-      width: 3px;
-      height: 25px;
-      background: var(--primary);
-      border-radius: 0 2px 2px 0;
-    }
-    
-    #battery-level {
+    #progress-fill {
       height: 100%;
       width: 100%;
       background: var(--primary);
       transition: width 1s linear;
     }
     
-    #message-container {
-      background: rgba(0, 184, 148, 0.1);
-      padding: 1rem;
-      border-radius: 10px;
-      border-right: 3px solid var(--primary);
-      margin-top: 1.5rem;
-    }
-    
     #message {
-      font-size: 1.1rem;
-      line-height: 1.8;
-      font-weight: 500;
-    }
-    
-    #message-source {
-      display: block;
-      text-align: left;
-      opacity: 0.7;
-      font-style: italic;
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .new-message {
-      animation: fadeIn 1s ease;
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-top: 2rem;
+      opacity: 0.9;
+      min-height: 50px;
     }
   </style>
 </head>
@@ -116,64 +88,32 @@
   <div id="timer">
     <div id="countdown">22:22:00</div>
     
-    <div class="battery">
-      <div id="battery-level"></div>
+    <div id="progress-container">
+      <div id="progress-bar">
+        <div id="progress-fill"></div>
+      </div>
     </div>
     
-    <div id="message-container">
-      <p id="message">"زمان مانند رودخانه جاری است - در همان آب دو بار قدم نمی‌زنی"</p>
-      <small id="message-source">هراکلیتوس</small>
-    </div>
+    <div id="message">"این لحظه برای همیشه می‌رود..."</div>
   </div>
 
   <script>
     // عناصر DOM
     const countdownEl = document.getElementById('countdown');
-    const batteryLevel = document.getElementById('battery-level');
+    const progressFill = document.getElementById('progress-fill');
     const messageEl = document.getElementById('message');
-    const sourceEl = document.getElementById('message-source');
-    const msgContainer = document.getElementById('message-container');
     
-    // پیام‌های انگیزشی با منابع
-    const timeMessages = [
-      {
-        text: "زمان گرانبهاترین دارایی توست - هرگز آن را بی‌هدف هدر نده",
-        source: "استیو جابز - سخنرانی استنفورد ۲۰۰۵"
-      },
-      {
-        text: "امروز تنها روزی است که مال توست - دیروز رفته و فردا نیامده",
-        source: "سعدی - گلستان"
-      },
-      {
-        text: "یک ساعت امروز بهتر از صد ساعت فرداست",
-        source: "ابوعلی سینا - کتاب قانون"
-      },
-      {
-        text: "موفقیت جمع انتخاب‌های کوچک روزانه است - همین امروز تصمیم بگیر",
-        source: "دارن هاردی - اثر مرکب"
-      },
-      {
-        text: "هر دقیقه‌ای که در برنامه‌ریزی صرف کنی، یک ساعت در اجرا صرفه‌جویی می‌کنی",
-        source: "برایان تریسی - قورباغه را قورت بده"
-      },
-      {
-        text: "امروز اولین روز باقی‌مانده از عمر توست - آن را باشکوه آغاز کن",
-        source: "مارک تواین"
-      }
+    // پیام‌های کوتاه و تاثیرگذار با ترجمه روان
+    const messages = [
+      "قطره‌های زمان می‌روند...",
+      "این ثانیه را دریاب",
+      "فرصت مانند باد می‌گذرد",
+      "زمان درحال عبور است",
+      "لحظه‌ات را آگاهانه زندگی کن",
+      "هر نفس یک فرصت است",
+      "حالا بهترین زمان است",
+      "زمان مانند آب روان است"
     ];
-    
-    // نمایش پیام تصادفی با افکت
-    function showRandomMessage() {
-      const {text, source} = timeMessages[Math.floor(Math.random() * timeMessages.length)];
-      
-      msgContainer.classList.remove('new-message');
-      void msgContainer.offsetWidth; // Trigger reflow
-      
-      messageEl.textContent = `"${text}"`;
-      sourceEl.textContent = `— ${source}`;
-      
-      msgContainer.classList.add('new-message');
-    }
     
     // تایمر اصلی
     function updateTimer() {
@@ -182,57 +122,84 @@
       const localOffset = now.getTimezoneOffset() * 60 * 1000;
       const tehranNow = new Date(now.getTime() + localOffset + tehranOffset);
       
-      // زمان 22:22 امروز
-      const targetToday = new Date(tehranNow);
-      targetToday.setHours(22, 22, 0, 0);
-      
-      // زمان 22:22 فردا
-      const targetTomorrow = new Date(targetToday);
-      targetTomorrow.setDate(targetTomorrow.getDate() + 1);
-      
-      // محاسبه زمان باقیمانده
-      let targetTime, timePassed;
-      if (tehranNow >= targetToday) {
-        targetTime = targetTomorrow;
-        timePassed = tehranNow - targetToday;
-      } else {
-        targetTime = targetToday;
-        timePassed = tehranNow - new Date(targetToday.getTime() - 24*60*60*1000);
+      // زمان هدف 22:22
+      const targetTime = new Date(tehranNow);
+      targetTime.setHours(22, 22, 0, 0);
+      if (tehranNow >= targetTime) {
+        targetTime.setDate(targetTime.getDate() + 1);
       }
       
       const diff = targetTime - tehranNow;
-      const totalDay = 24 * 60 * 60 * 1000;
+      const totalSeconds = Math.floor(diff / 1000);
+      
+      // محاسبه زمان باقیمانده
+      const hours = Math.floor(totalSeconds / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = totalSeconds % 60;
       
       // نمایش تایمر
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const secs = Math.floor((diff % (1000 * 60)) / 1000);
-      
       countdownEl.textContent = 
         `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
       
-      // به‌روزرسانی باتری
-      const batteryPercent = (timePassed / totalDay) * 100;
-      batteryLevel.style.width = `${100 - batteryPercent}%`;
+      // محاسبه درصد پیشرفت (معکوس برای خالی شدن)
+      const totalDaySeconds = 24 * 3600;
+      const percentRemaining = (totalSeconds / totalDaySeconds) * 100;
+      progressFill.style.width = `${percentRemaining}%`;
       
-      // تغییر حالت در 3 ساعت پایانی
-      if (hours < 3) {
-        countdownEl.classList.add('warning');
-        batteryLevel.style.background = "var(--warning)";
-      } else {
+      // تغییر حالت‌های هشدار
+      if (hours < 1) {
+        // حالت اضطراری (کمتر از 1 ساعت)
+        countdownEl.classList.add('critical');
         countdownEl.classList.remove('warning');
-        batteryLevel.style.background = "var(--primary)";
+        progressFill.style.background = "var(--critical)";
+        
+        // تغییر پیام هر 30 ثانیه
+        if (secs % 30 === 0) {
+          showRandomMessage();
+        }
+      } 
+      else if (hours < 3) {
+        // حالت هشدار (کمتر از 3 ساعت)
+        countdownEl.classList.add('warning');
+        countdownEl.classList.remove('critical');
+        progressFill.style.background = "var(--warning)";
+        
+        // تغییر پیام هر 2 دقیقه
+        if (mins % 2 === 0 && secs === 0) {
+          showRandomMessage();
+        }
+      } 
+      else {
+        // حالت عادی
+        countdownEl.classList.remove('warning', 'critical');
+        progressFill.style.background = "var(--primary)";
+        
+        // تغییر پیام هر 5 دقیقه
+        if (mins % 5 === 0 && secs === 0) {
+          showRandomMessage();
+        }
       }
+    }
+    
+    // نمایش پیام تصادفی
+    function showRandomMessage() {
+      const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+      messageEl.textContent = `"${randomMsg}"`;
       
-      // تغییر پیام هر 5 دقیقه
-      if (mins % 5 === 0 && secs === 0) {
-        showRandomMessage();
-      }
+      // افکت ساده
+      messageEl.style.opacity = 0;
+      setTimeout(() => {
+        messageEl.style.opacity = 1;
+        messageEl.style.transition = 'opacity 0.5s ease';
+      }, 100);
     }
     
     // راه‌اندازی
     updateTimer();
     setInterval(updateTimer, 1000);
+    
+    // نمایش اولین پیام
+    setTimeout(showRandomMessage, 1000);
   </script>
 </body>
 </html>
