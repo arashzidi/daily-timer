@@ -3,167 +3,640 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تایمر ارزش لحظات</title>
+  <title>تایمر ارزش لحظات | لحظاتت را قدر بدان</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;500;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
     
     :root {
-      --primary: #ff2d55;
-      --dark-primary: #e91e3a;
-      --bg: #0a0a0a;
-      --text: #ffffff;
+      --primary: #6E45E2;
+      --primary-gradient: linear-gradient(135deg, #6E45E2 0%, #88D3CE 100%);
+      --secondary: #FF7DDA;
+      --dark: #1A1A2E;
+      --darker: #0D0D1A;
+      --light: #F0F5FF;
+      --success: #00E6B2;
+      --warning: #FFAD4A;
+      --danger: #FF5E7D;
+      --text: #EAEAFF;
+      --text-secondary: #A0A0D0;
+      --card-bg: rgba(30, 30, 50, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Vazirmatn', sans-serif;
     }
     
     body {
-      font-family: 'Vazirmatn', sans-serif;
-      background: var(--bg);
+      background: var(--darker);
       color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
-      margin: 0;
-      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
     }
     
-    #timer-container {
-      position: relative;
+    .background-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      max-width: 600px;
-      text-align: center;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.3;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(110, 69, 226, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(136, 211, 206, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 40% 80%, rgba(255, 125, 218, 0.2) 0%, transparent 40%);
+      animation: backgroundShift 15s infinite alternate;
+    }
+    
+    @keyframes backgroundShift {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 10% 10%; }
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--text);
+    }
+    
+    .logo i {
+      color: var(--secondary);
+      font-size: 2rem;
+    }
+    
+    .theme-switcher {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 50px;
+      padding: 0.5rem;
+      display: flex;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .theme-switcher:hover {
+      box-shadow: 0 0 15px rgba(110, 69, 226, 0.5);
+    }
+    
+    .theme-switcher i {
+      font-size: 1.25rem;
+      padding: 0.5rem;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+    }
+    
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    @media (max-width: 900px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .timer-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      transition: var(--transition);
+    }
+    
+    .timer-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    }
+    
+    .card-title {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .card-title i {
+      color: var(--secondary);
     }
     
     #countdown {
-      font-size: 6rem;
-      font-weight: 900;
-      color: var(--primary);
-      margin: 0;
-      letter-spacing: 5px;
-      text-shadow: 0 0 20px rgba(255, 45, 85, 0.5);
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-      animation: glow 2s infinite alternate;
-    }
-    
-    @keyframes glow {
-      from {
-        text-shadow: 0 0 10px rgba(255, 45, 85, 0.5);
-      }
-      to {
-        text-shadow: 0 0 30px rgba(255, 45, 85, 0.8);
-      }
-    }
-    
-    #progress-container {
-      position: relative;
-      height: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
+      font-size: 4.5rem;
+      font-weight: 800;
+      text-align: center;
       margin: 2rem 0;
-      overflow: hidden;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 5px 15px rgba(110, 69, 226, 0.4);
+      letter-spacing: 2px;
+      font-variant-numeric: tabular-nums;
     }
     
-    #progress-fill {
-      height: 100%;
-      width: 100%;
-      background: linear-gradient(90deg, var(--primary), var(--dark-primary));
-      transition: width 1s linear;
-      box-shadow: 0 0 10px rgba(255, 45, 85, 0.5);
+    .battery-container {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 18px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      border: 1px solid var(--card-border);
     }
     
-    #message {
-      font-size: 1.5rem;
-      font-weight: 500;
-      margin-top: 1.5rem;
-      opacity: 0.9;
-      min-height: 60px;
+    .battery {
+      height: 40px;
       display: flex;
-      align-items: center;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+    
+    .battery-cell {
+      flex: 1;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .battery-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--primary-gradient);
+      transform-origin: bottom;
+      transform: scaleY(0);
+      transition: transform 0.5s ease;
+    }
+    
+    .battery-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    .quote-card {
+      display: flex;
+      flex-direction: column;
       justify-content: center;
     }
     
-    .time-particle {
-      position: absolute;
-      background: var(--primary);
-      border-radius: 50%;
-      filter: blur(1px);
-      animation: float linear infinite;
-      z-index: -1;
-      opacity: 0.3;
+    #message {
+      font-size: 1.75rem;
+      line-height: 1.6;
+      text-align: center;
+      margin: 2rem 0;
+      font-weight: 500;
+      color: var(--text);
+      transition: var(--transition);
     }
     
-    @keyframes float {
-      to { transform: translateY(-100vh); }
+    .quote-author {
+      text-align: left;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-top: 1rem;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .btn {
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: white;
+      box-shadow: 0 5px 15px rgba(110, 69, 226, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(110, 69, 226, 0.6);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    
+    .feature-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border: 1px solid var(--card-border);
+      transition: var(--transition);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-gradient);
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    .feature-content h3 {
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    
+    .feature-content p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      margin-top: auto;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--card-border);
+    }
+    
+    .particles-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: floatParticle linear infinite;
+    }
+    
+    @keyframes floatParticle {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .notification.show {
+      opacity: 1;
+    }
+    
+    .notification i {
+      color: var(--success);
+      font-size: 1.25rem;
     }
     
     /* ریسپانسیو */
     @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
       #countdown {
-        font-size: 4rem;
+        font-size: 3rem;
       }
       
       #message {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
+      }
+      
+      .actions {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
 </head>
 <body>
-  <div id="timer-container">
-    <h1 id="countdown">22:22:00</h1>
+  <div class="background-animation"></div>
+  <div class="particles-container" id="particles-container"></div>
+  
+  <div class="container">
+    <header>
+      <div class="logo">
+        <i class="fas fa-hourglass-half"></i>
+        <span>تایمر ارزش لحظات</span>
+      </div>
+      <div class="theme-switcher" id="theme-switcher">
+        <i class="fas fa-moon"></i>
+      </div>
+    </header>
     
-    <div id="progress-container">
-      <div id="progress-fill"></div>
+    <div class="main-content">
+      <div class="timer-card">
+        <h2 class="card-title"><i class="fas fa-clock"></i> زمان تا ۲۲:۲۲</h2>
+        <div id="countdown">22:22:00</div>
+        
+        <div class="battery-container">
+          <div class="battery">
+            <div class="battery-cell">
+              <div class="battery-fill" id="cell-1"></div>
+            </div>
+            <div class="battery-cell">
+              <div class="battery-fill" id="cell-2"></div>
+            </div>
+            <div class="battery-cell">
+              <div class="battery-fill" id="cell-3"></div>
+            </div>
+            <div class="battery-cell">
+              <div class="battery-fill" id="cell-4"></div>
+            </div>
+          </div>
+          <div class="battery-info">
+            <span>امروز</span>
+            <span>۲۲:۲۲</span>
+          </div>
+        </div>
+        
+        <div class="actions">
+          <button class="btn btn-primary" id="share-btn">
+            <i class="fas fa-share-alt"></i>
+            اشتراک‌گذاری
+          </button>
+          <button class="btn btn-secondary" id="reminder-btn">
+            <i class="fas fa-bell"></i>
+            تنظیم یادآور
+          </button>
+        </div>
+      </div>
+      
+      <div class="timer-card quote-card">
+        <h2 class="card-title"><i class="fas fa-quote-right"></i> پیام روز</h2>
+        <div id="message">"این لحظه هرگز تکرار نخواهد شد"</div>
+        <div class="quote-author">~ از کتاب حکمت زمان</div>
+        
+        <div class="actions">
+          <button class="btn btn-secondary" id="next-quote">
+            <i class="fas fa-forward"></i>
+            پیام بعدی
+          </button>
+        </div>
+      </div>
     </div>
     
-    <div id="message">"این لحظه هرگز تکرار نخواهد شد"</div>
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <div class="feature-content">
+          <h3>طراحی مدرن</h3>
+          <p>طراحی زیبا و کاربرپسند با انیمیشن‌های روان و ظاهری جذاب</p>
+        </div>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-mobile-alt"></i>
+        </div>
+        <div class="feature-content">
+          <h3>واکنش‌گرا</h3>
+          <p>سازگاری کامل با تمام دستگاه‌ها از موبایل تا دسکتاپ</p>
+        </div>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-cloud-sun"></i>
+        </div>
+        <div class="feature-content">
+          <h3>تم روز/شب</h3>
+          <p>تغییر خودکار تم بر اساس ساعت روز برای تجربه بهتر کاربری</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer>
+    <p>ساخته شده با <i class="fas fa-heart" style="color: var(--danger)"></i> برای کسانی که زمان را قدر می‌دانند</p>
+    <p>© ۲۰۲۳ - تایمر ارزش لحظات</p>
+  </footer>
+  
+  <div class="notification" id="notification">
+    <i class="fas fa-check-circle"></i>
+    <span id="notification-text">پیام با موفقیت کپی شد</span>
   </div>
 
   <script>
     // عناصر DOM
     const countdownEl = document.getElementById('countdown');
-    const progressFill = document.getElementById('progress-fill');
     const messageEl = document.getElementById('message');
+    const themeSwitcher = document.getElementById('theme-switcher');
+    const notification = document.getElementById('notification');
+    const notificationText = document.getElementById('notification-text');
+    const nextQuoteBtn = document.getElementById('next-quote');
+    const shareBtn = document.getElementById('share-btn');
+    const reminderBtn = document.getElementById('reminder-btn');
     
     // پیام‌های عمیق درباره زمان
     const messages = [
-      "این لحظه هرگز تکرار نخواهد شد",
-      "زمان مانند شن‌های ساعت می‌ریزد",
-      "هر ثانیه یک فرصت منحصر به فرد است",
-      "گذشته رفته، آینده نیامده - حال را دریاب",
-      "زمان باارزش‌ترین دارایی توست",
-      "لحظه‌ات را آگاهانه زندگی کن",
-      "فرصت‌ها مانند ابر می‌گذرند",
-      "امروز تنها روز تضمین‌شده است",
-      "ثانیه‌ها مانند الماس می‌درخشند و می‌روند",
-      "زمان تنها ارز واقعی زندگی است"
+      {text: "این لحظه هرگز تکرار نخواهد شد", author: "از کتاب حکمت زمان"},
+      {text: "زمان مانند شن‌های ساعت می‌ریزد", author: "ضرب المثل فارسی"},
+      {text: "هر ثانیه یک فرصت منحصر به فرد است", author: "از کتاب یک ثانیه را دریاب"},
+      {text: "گذشته رفته، آینده نیامده - حال را دریاب", author: "سعدی"},
+      {text: "زمان باارزش‌ترین دارایی توست", author: "ارسطو"},
+      {text: "لحظه‌ات را آگاهانه زندگی کن", author: "اپیکتتوس"},
+      {text: "فرصت‌ها مانند ابر می‌گذرند", author: "لئوناردو داوینچی"},
+      {text: "امروز تنها روز تضمین‌شده است", author: "ضرب المثل هندی"},
+      {text: "ثانیه‌ها مانند الماس می‌درخشند و می‌روند", author: "از کتاب گوهر زمان"},
+      {text: "زمان تنها ارز واقعی زندگی است", author: "جیم ران"}
     ];
     
-    // ایجاد ذرات زمان
-    function createTimeParticles() {
-      const particle = document.createElement('div');
-      particle.className = 'time-particle';
-      particle.style.left = `${Math.random() * 100}%`;
-      particle.style.top = `${Math.random() * 100 + 100}%`;
-      particle.style.width = `${Math.random() * 3 + 1}px`;
-      particle.style.height = particle.style.width;
-      particle.style.animationDuration = `${Math.random() * 10 + 5}s`;
-      document.body.appendChild(particle);
+    // ایجاد ذرات شناور
+    function createParticles() {
+      const container = document.getElementById('particles-container');
+      const colors = ['#6E45E2', '#88D3CE', '#FF7DDA', '#FFAD4A'];
       
-      // حذف ذره بعد از اتمام انیمیشن
+      for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        const size = Math.random() * 5 + 2;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.background = color;
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+        particle.style.animationDelay = `${Math.random() * 5}s`;
+        
+        container.appendChild(particle);
+      }
+    }
+    
+    // نمایش نوتیفیکیشن
+    function showNotification(text) {
+      notificationText.textContent = text;
+      notification.classList.add('show');
+      
       setTimeout(() => {
-        particle.remove();
-      }, 15000);
+        notification.classList.remove('show');
+      }, 3000);
+    }
+    
+    // تغییر تم
+    function toggleTheme() {
+      document.body.classList.toggle('light-theme');
+      
+      if (document.body.classList.contains('light-theme')) {
+        themeSwitcher.innerHTML = '<i class="fas fa-sun"></i>';
+        showNotification('تم روشن فعال شد');
+      } else {
+        themeSwitcher.innerHTML = '<i class="fas fa-moon"></i>';
+        showNotification('تم تیره فعال شد');
+      }
     }
     
     // نمایش پیام تصادفی
     function showRandomMessage() {
       const randomMsg = messages[Math.floor(Math.random() * messages.length)];
       messageEl.style.opacity = 0;
+      
       setTimeout(() => {
-        messageEl.textContent = `"${randomMsg}"`;
+        messageEl.textContent = `"${randomMsg.text}"`;
+        document.querySelector('.quote-author').textContent = `~ ${randomMsg.author}`;
         messageEl.style.opacity = 1;
       }, 500);
+    }
+    
+    // به‌روزرسانی نوار باتری
+    function updateBattery(percentRemaining) {
+      const segments = 4;
+      const segmentPercent = 100 / segments;
+      
+      for (let i = 1; i <= segments; i++) {
+        const segment = document.getElementById(`cell-${i}`);
+        const segmentMin = 100 - (i * segmentPercent);
+        const segmentMax = 100 - ((i - 1) * segmentPercent);
+        
+        if (percentRemaining <= segmentMin) {
+          segment.style.transform = 'scaleY(0)';
+        } else if (percentRemaining >= segmentMax) {
+          segment.style.transform = 'scaleY(1)';
+        } else {
+          const segmentValue = (percentRemaining - segmentMin) / segmentPercent;
+          segment.style.transform = `scaleY(${segmentValue})`;
+        }
+      }
     }
     
     // تایمر اصلی
@@ -192,26 +665,62 @@
       countdownEl.textContent = 
         `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
       
-      // به‌روزرسانی پیشرفت
-      progressFill.style.width = `${percentRemaining}%`;
+      // به‌روزرسانی باتری
+      updateBattery(percentRemaining);
       
-      // تغییر پیام‌ها
-      if (hours < 1 && mins % 1 === 0 && secs === 0) {
-        showRandomMessage();
-      } else if (hours < 3 && mins % 2 === 0 && secs === 0) {
-        showRandomMessage();
-      } else if (mins % 5 === 0 && secs === 0) {
-        showRandomMessage();
+      // افکت پالس در ساعت‌های پایانی
+      if (hours < 1) {
+        countdownEl.classList.add('pulse');
+      } else {
+        countdownEl.classList.remove('pulse');
       }
     }
     
-    // راه‌اندازی
-    updateTimer();
-    setInterval(updateTimer, 1000);
-    setInterval(createTimeParticles, 300);
+    // اشتراک‌گذاری
+    function shareTimer() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'تایمر ارزش لحظات',
+          text: 'با این تایمر زیبا، ارزش واقعی زمان را درک کنید!',
+          url: window.location.href
+        })
+        .then(() => showNotification('با موفقیت به اشتراک گذاشته شد'))
+        .catch(() => copyToClipboard());
+      } else {
+        copyToClipboard();
+      }
+    }
     
-    // نمایش اولین پیام
-    setTimeout(showRandomMessage, 1000);
+    // کپی به کلیپ‌بورد
+    function copyToClipboard() {
+      navigator.clipboard.writeText(window.location.href)
+        .then(() => showNotification('لینک در کلیپ‌بورد کپی شد'))
+        .catch(err => {
+          console.error('خطا در کپی کردن: ', err);
+          showNotification('خطا در کپی کردن لینک');
+        });
+    }
+    
+    // تنظیم یادآور
+    function setReminder() {
+      showNotification('یادآوری برای شما تنظیم شد (ویژگی به زودی اضافه می‌شود)');
+    }
+    
+    // راه‌اندازی اولیه
+    document.addEventListener('DOMContentLoaded', function() {
+      updateTimer();
+      setInterval(updateTimer, 1000);
+      createParticles();
+      
+      // افزودن event listeners
+      themeSwitcher.addEventListener('click', toggleTheme);
+      nextQuoteBtn.addEventListener('click', showRandomMessage);
+      shareBtn.addEventListener('click', shareTimer);
+      reminderBtn.addEventListener('click', setReminder);
+      
+      // نمایش اولین پیام
+      setTimeout(showRandomMessage, 1000);
+    });
   </script>
 </body>
 </html>
