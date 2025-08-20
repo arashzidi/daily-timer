@@ -169,6 +169,14 @@
       font-variant-numeric: tabular-nums;
     }
     
+    .time-label {
+      text-align: center;
+      margin-top: -1.5rem;
+      margin-bottom: 2rem;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+    
     .battery-container {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 18px;
@@ -204,11 +212,12 @@
       transition: transform 0.5s ease;
     }
     
-    .battery-info {
+    .progress-info {
       display: flex;
       justify-content: space-between;
       font-size: 0.9rem;
       color: var(--text-secondary);
+      margin-top: 1rem;
     }
     
     .quote-card {
@@ -433,7 +442,7 @@
     <header>
       <div class="logo">
         <i class="fas fa-hourglass-half"></i>
-        <span>تایمر ارزش لحظات</span>
+        <span>ارزش لحظات</span>
       </div>
       <div class="theme-switcher" id="theme-switcher">
         <i class="fas fa-moon"></i>
@@ -442,8 +451,9 @@
     
     <div class="main-content">
       <div class="timer-card">
-        <h2 class="card-title"><i class="fas fa-clock"></i> زمان تا ۲۲:۲۲</h2>
+        <h2 class="card-title"><i class="fas fa-bolt"></i> گذر زمان</h2>
         <div id="countdown">22:22:00</div>
+        <div class="time-label">تا پایان امروز</div>
         
         <div class="battery-container">
           <div class="battery">
@@ -460,9 +470,10 @@
               <div class="battery-fill" id="cell-4"></div>
             </div>
           </div>
-          <div class="battery-info">
-            <span>امروز</span>
-            <span>۲۲:۲۲</span>
+          <div class="progress-info">
+            <span>صبح</span>
+            <span>عصر</span>
+            <span>شب</span>
           </div>
         </div>
         
@@ -473,20 +484,20 @@
           </button>
           <button class="btn btn-secondary" id="reminder-btn">
             <i class="fas fa-bell"></i>
-            تنظیم یادآور
+            یادآوری
           </button>
         </div>
       </div>
       
       <div class="timer-card quote-card">
-        <h2 class="card-title"><i class="fas fa-quote-right"></i> پیام روز</h2>
+        <h2 class="card-title"><i class="fas fa-quote-right"></i> حکمت روز</h2>
         <div id="message">"این لحظه هرگز تکرار نخواهد شد"</div>
         <div class="quote-author">~ از کتاب حکمت زمان</div>
         
         <div class="actions">
           <button class="btn btn-secondary" id="next-quote">
             <i class="fas fa-forward"></i>
-            پیام بعدی
+            حکمت بعدی
           </button>
         </div>
       </div>
@@ -518,8 +529,8 @@
           <i class="fas fa-cloud-sun"></i>
         </div>
         <div class="feature-content">
-          <h3>تم روز/شب</h3>
-          <p>تغییر خودکار تم بر اساس ساعت روز برای تجربه بهتر کاربری</p>
+          <h3>نمایش پیشرفت</h3>
+          <p>ردیابی پیشرفت روز با نوار باتری و نمایش گرافیکی زمان</p>
         </div>
       </div>
     </div>
@@ -527,7 +538,7 @@
   
   <footer>
     <p>ساخته شده با <i class="fas fa-heart" style="color: var(--danger)"></i> برای کسانی که زمان را قدر می‌دانند</p>
-    <p>© ۲۰۲۳ - تایمر ارزش لحظات</p>
+    <p>© ۲۰۲۳ - ارزش لحظات</p>
   </footer>
   
   <div class="notification" id="notification">
@@ -646,12 +657,9 @@
       const localOffset = now.getTimezoneOffset() * 60 * 1000;
       const tehranNow = new Date(now.getTime() + localOffset + tehranOffset);
       
-      // زمان 22:22 امروز
+      // زمان پایان امروز (نیمه شب)
       const targetTime = new Date(tehranNow);
-      targetTime.setHours(22, 22, 0, 0);
-      if (tehranNow >= targetTime) {
-        targetTime.setDate(targetTime.getDate() + 1);
-      }
+      targetTime.setHours(24, 0, 0, 0);
       
       const diff = targetTime - tehranNow;
       const totalDay = 24 * 60 * 60 * 1000;
@@ -680,7 +688,7 @@
     function shareTimer() {
       if (navigator.share) {
         navigator.share({
-          title: 'تایمر ارزش لحظات',
+          title: 'ارزش لحظات',
           text: 'با این تایمر زیبا، ارزش واقعی زمان را درک کنید!',
           url: window.location.href
         })
