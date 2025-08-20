@@ -169,14 +169,6 @@
       font-variant-numeric: tabular-nums;
     }
     
-    .time-label {
-      text-align: center;
-      margin-top: -1.5rem;
-      margin-bottom: 2rem;
-      color: var(--text-secondary);
-      font-size: 1.1rem;
-    }
-    
     .battery-container {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 18px;
@@ -234,6 +226,10 @@
       font-weight: 500;
       color: var(--text);
       transition: var(--transition);
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .quote-author {
@@ -421,6 +417,7 @@
       
       #message {
         font-size: 1.4rem;
+        min-height: 100px;
       }
       
       .actions {
@@ -453,7 +450,6 @@
       <div class="timer-card">
         <h2 class="card-title"><i class="fas fa-bolt"></i> گذر زمان</h2>
         <div id="countdown">22:22:00</div>
-        <div class="time-label">تا پایان امروز</div>
         
         <div class="battery-container">
           <div class="battery">
@@ -557,7 +553,7 @@
     const shareBtn = document.getElementById('share-btn');
     const reminderBtn = document.getElementById('reminder-btn');
     
-    // پیام‌های عمیق درباره زمان
+    // پیام‌های عمیق درباره زمان (تعداد بیشتری اضافه شد)
     const messages = [
       {text: "این لحظه هرگز تکرار نخواهد شد", author: "از کتاب حکمت زمان"},
       {text: "زمان مانند شن‌های ساعت می‌ریزد", author: "ضرب المثل فارسی"},
@@ -568,7 +564,27 @@
       {text: "فرصت‌ها مانند ابر می‌گذرند", author: "لئوناردو داوینچی"},
       {text: "امروز تنها روز تضمین‌شده است", author: "ضرب المثل هندی"},
       {text: "ثانیه‌ها مانند الماس می‌درخشند و می‌روند", author: "از کتاب گوهر زمان"},
-      {text: "زمان تنها ارز واقعی زندگی است", author: "جیم ران"}
+      {text: "زمان تنها ارز واقعی زندگی است", author: "جیم ران"},
+      {text: "دیروز تاریخ است، فردا رازی است، امروز هدیه‌ای است", author: "ضرب المثل چینی"},
+      {text: "زمان بهترین معلم است، ولی متأسفانه همه شاگردانش را می‌کشد", author: "هکتور برلیوز"},
+      {text: "وقت طلاست، اما نمی‌توانی آن را ذخیره کنی", author: "آرنولد بنت"},
+      {text: "زمانی که برای گُل رز کردن می‌گذاری، باعث زیبایی باغچه تو می‌شود", author: "ضرب المثل انگلیسی"},
+      {text: "بهترین زمان برای کاشتن درخت بیست سال پیش بود، زمان بعدی همین الان است", author: "ضرب المثل چینی"},
+      {text: "زمان پول نیست، زمان همه چیز است", author: "ضرب المثل ژاپنی"},
+      {text: "ساعت‌ها کند می‌گذرند، اما سال‌ها به سرعت می‌گذرند", author: "آلیس مونرو"},
+      {text: "زمان دشمن سرسخت زیبایی و دوست حکمت است", author: "لوسی لاکومب"},
+      {text: "زمانی که می‌دزدند از گرانبهاترین چیزها می‌دزدند", author: "ضرب المثل یونانی"},
+      {text: "زمان کافی نیست، این تو هستی که کافی نیستی", author: "ضرب المثل هندی"},
+      {text: "زمان مانند رودخانه‌ای است که هر چیزی که در راهش باشد با خود می‌برد", author: "هراکلیتوس"},
+      {text: "زمان بهترین پزشک است، اما بدترین زیباساز", author: "ضرب المثل انگلیسی"},
+      {text: "زمانی که از دست رفته، هرگز باز نمی‌گردد", author: "بنجامین فرانکلین"},
+      {text: "زمان با همه درمان می‌شود، اما خودش درمان ندارد", author: "ضرب المثل عربی"},
+      {text: "زمان دشمنی است که به دوستی تبدیل می‌شود", author: "ضرب المثل روسی"},
+      {text: "زمانی که می‌ترسی، زمان از دست می‌دهی", author: "ضرب المثل آفریقایی"},
+      {text: "زمان مانند باد است، نمی‌توانی آن را بگیری، فقط می‌توانی از آن استفاده کنی", author: "ضرب المثل چینی"},
+      {text: "بهترین استفاده از زمان، سرمایه‌گذاری در دانش است", author: "بنجامین فرانکلین"},
+      {text: "زمانی که برای کمک به دیگران صرف می‌کنی، هرگز هدر نمی‌رود", author: "ضرب المثل ایرانی"},
+      {text: "زمان مانند شمشیر دو لبه است، اگر از آن استفاده نکنی، تو را می‌برد", author: "لئوناردو داوینچی"}
     ];
     
     // ایجاد ذرات شناور
@@ -657,9 +673,12 @@
       const localOffset = now.getTimezoneOffset() * 60 * 1000;
       const tehranNow = new Date(now.getTime() + localOffset + tehranOffset);
       
-      // زمان پایان امروز (نیمه شب)
+      // زمان 22:22 امروز
       const targetTime = new Date(tehranNow);
-      targetTime.setHours(24, 0, 0, 0);
+      targetTime.setHours(22, 22, 0, 0);
+      if (tehranNow >= targetTime) {
+        targetTime.setDate(targetTime.getDate() + 1);
+      }
       
       const diff = targetTime - tehranNow;
       const totalDay = 24 * 60 * 60 * 1000;
@@ -681,6 +700,15 @@
         countdownEl.classList.add('pulse');
       } else {
         countdownEl.classList.remove('pulse');
+      }
+      
+      // تغییر پیام‌ها
+      if (hours < 1 && mins % 1 === 0 && secs === 0) {
+        showRandomMessage();
+      } else if (hours < 3 && mins % 2 === 0 && secs === 0) {
+        showRandomMessage();
+      } else if (mins % 5 === 0 && secs === 0) {
+        showRandomMessage();
       }
     }
     
